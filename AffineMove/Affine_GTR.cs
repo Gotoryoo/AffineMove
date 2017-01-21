@@ -40,8 +40,31 @@ namespace AffineMove
                 pl_to_pl.Q = Q;
             }
             file.Close();
+            //affine変換のパラメータが格納された。
+
+            Vector2 track = new Vector2();//track座標の仮置き ここをtxtファイル読み込みで行うのか、scan0的なファイルから読み取るのかはまだ分からないので、とりあえずこのように置く。
+
+            Vector2 track_now = pl_to_pl.Trance(track);//これでtrack_nowには座標変換されたtrackのstageが格納される。
 
             //最後に乾板の回転等を考慮して座標を変換して終了。
+            string path2 = "C:\\Users\\GTR\\mag_theta.txt";
+
+            double mag;
+            double theta;
+
+            System.IO.StreamReader file2 = new System.IO.StreamReader(path2);
+            string line2;
+            while ((line2 = file2.ReadLine()) != null)
+            {
+                string[] data = line2.Split(' ');
+                mag = double.Parse(data[0]);
+                theta = double.Parse(data[1]);
+            }
+            file2.Close();
+            //今後は乾板の傾き等も考慮する必要がある？と思うので、一応乾板の傾きを読み取る。
+            //必要になるのならばこの傾きで、座標変換した座標を計算し直す。
+
+
         }
     }
 }
