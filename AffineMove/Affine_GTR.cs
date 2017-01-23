@@ -11,16 +11,89 @@ namespace AffineMove
 {
     class Affine_GTR
     {
+        public struct gridmark
+        {
+            public double x;
+            public double y;
+            //public bool xflag;
+        }
+
+        static List<gridmark> GridMarks(string txtname)
+        {
+            List<gridmark> gridmarks = new List<gridmark>();
+            string line;
+
+            System.IO.StreamReader file = new System.IO.StreamReader(txtname);
+            while ((line = file.ReadLine()) != null)
+            {
+                gridmark mark;
+                string line4 = line.Replace("    ", "  ");
+                string line2 = line4.Replace("   ", " ");
+                string line3 = line2.Replace("  ", " ");
+                string[] data = line3.Split(' ');
+
+                if (data[0] == "#")
+                {
+                    continue;
+                }
+
+                double x = double.Parse(data[1]);
+                double y = double.Parse(data[2]);
+
+                mark.x = x;
+                mark.y = y;
+
+                gridmarks.Add(mark);
+            }
+            file.Close();
+
+            return gridmarks;
+        }
+
+        static Vector2 getTheNearest(List<gridmark> GridMarks, double x, double y)
+        {
+            Vector2 near = new Vector2();
+            double nearx = new double();
+            double neary = new double();
+
+            double mindist = 999999.9;
+
+            for (int i = 0; i < GridMarks.Count(); i++)
+            {
+                double dx = x - GridMarks[i].x;
+                double dy = y - GridMarks[i].y;
+                double dr = Math.Sqrt(dx * dx + dy * dy);
+
+                if (dr < mindist)
+                {
+                    mindist = dr;
+                    nearx = GridMarks[i].x;
+                    neary = GridMarks[i].y;
+                }
+            }
+
+            near.X = nearx;
+            near.Y = neary;
+
+            return near;
+        }
+
+
+
         static void Main(string[] args)
         {
+            string path = "C:\\Users\\GTR\\Documents\\";
+
+            List<gridmark> negaGrid = GridMarks(path + "Grid_E07_20170105.gorg");
+
             //Affin.csにaffineパラメータを格納する関数が存在する。
             //txtに記録されたaffineパラメータを読み取り、そのパラメータを使用して、指定した前プレートでのtrackの位置(stage座標)を現プレートに変換する。
 
             Affine pl_to_pl = new Affine();
 
-            string path = "C:\\Users\\GTR\\Affinepara.txt";
 
-            System.IO.StreamReader file = new System.IO.StreamReader(path);
+
+            System.IO.StreamReader file = new System.IO.StreamReader(path + "Affinepara.txt");
             string line;
             while ((line = file.ReadLine()) != null)
             {
@@ -47,7 +120,7 @@ namespace AffineMove
             Vector2 track_now = pl_to_pl.Trance(track);//これでtrack_nowには座標変換されたtrackのstageが格納される。
 
             //最後に乾板の回転等を考慮して座標を変換して終了。
-            string path2 = "C:\\Users\\GTR\\mag_theta.txt";
+            string path2 = "C:\\Users\\GTR\\Documents\\mag_theta.txt";
 
             double mag;
             double theta;
